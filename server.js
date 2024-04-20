@@ -14,6 +14,9 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/api/products",productRouter);
+app.use("/",(req,res)=>{
+    res.json({message : "Hello welcome from nodeJs E-commerceApi"});
+});
 
 mongoose.connect(DB).then(()=>{
     console.log("Database_Connected");
