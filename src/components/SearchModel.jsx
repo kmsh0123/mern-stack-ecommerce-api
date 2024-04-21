@@ -8,31 +8,36 @@ export function SearchModel() {
   const [products,setProducts] = useState([]);
 
 
-  const dataFetch = async () =>{
-    const {data} = await axios.get(`https://ecommerce-api-pg2i.onrender.com/api/products?query=${query}`);
-    const products = (data?.products);
-    setProducts(products)
-    console.log(products);
-  }
-  useEffect(()=>{
-    dataFetch()
-  },[])
+  const fetchData = async () => {
+    try {
+      const { data } = await axios.get(
+        `https://ecommerce-api-pg2i.onrender.com/api/products?query=${query}`
+      );
+      const products = data?.products;
+      setProducts(products);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData()
+
+    if (query !== "") {
+      fetchData();
+    }
+  }, [query]);
 
 
   const handleInputChange = (e) => {
     setQuery(e.target.value);
   };
 
-  // const handleSubmit = async (event) => {
-  //   event.preventDefault();
-  //   try {
-  //     const {data} = await axios.get(`https://ecommerce-api-pg2i.onrender.com/api/products?query=${query}`);
-  //     const products = (data?.products);
-  //     setProducts(products)
-  //   } catch (error) {
-  //     console.error('Error fetching data:', error);
-  //   }
-  // };
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setOpenModal(true);
+  };
+
   return (
     <>
     <div className='flex flex-col items-center container mx-auto'>
@@ -44,7 +49,7 @@ export function SearchModel() {
     onClick={() => setOpenModal(true)}/>
     </div>
    
-    <form className='flex flex-col items-center container mx-auto'>
+    <form onSubmit={handleSubmit} className='flex flex-col items-center container mx-auto'>
     <Modal show={openModal} onClose={() => setOpenModal(false)}>
         <Modal.Header>
         <input 
@@ -61,7 +66,7 @@ export function SearchModel() {
         // Display the image if searchQuery is empty
         <h1 className="text-center">Please search want to products</h1>
       ) : (
-              products.filter(f=>f.title.toLowerCase().includes(query)).map(pd=>(
+              products?.map(pd=>(
               <ul key={pd.id} className="hover:bg-blue-900 hover:text-white">
                 <li className="flex">
                  <img className="w-24 h-24 rounded" src={pd.image} alt="" />
